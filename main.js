@@ -162,12 +162,11 @@ function getPsnPresence() {
 
 function updateRPC() {
     var obj = store.get('accountInfo')
-    console.log(obj.platform)
+   // console.log(obj.platform)
     if (obj.titleName != undefined) {
         client.updatePresence({
             state: 'Playing: ' + obj.titleName,
             //details: obj.onlineStatus,
-            startTimestamp: Date.now(),
             largueImageKey: 'ps_largue',
             smallImageKey: 'ps_small',
             instance: true
