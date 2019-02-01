@@ -1,4 +1,4 @@
-const client = require('discord-rich-presence')('457775893746810880')
+const client = require('discord-rich-presence')('540701717617180673')
 
 var unixTimestamp = Math.round(new Date("2017-09-15 00:00:00.000").getTime() / 1000);
 
@@ -20,9 +20,7 @@ function createWindow() {
         event.sender.send('nickname', store.get('onlineID'))
     })
 
-
     ipcMain.on('logout-function', (event, arg) => {
-
         store.delete('accountInfo')
         store.delete('responses')
         app.relaunch()
@@ -104,6 +102,8 @@ function login(code) {
     req.write(data)
     req.end()
     if (store.get('accountInfo') == undefined) {
+        app.relaunch()
+        setTimeout(function(){ app.exit() }, 2000);
         console.log('exiting')
     }
 }
@@ -145,9 +145,9 @@ function getPsnPresence() {
         })
         res.on('end', function () {
             var d = JSON.parse(data)
-            store.set('onlineID', d.profile.onlineId)
+            store.set('onlineId', d.profile.onlineId)
             store.set('profilePicture', d.profile.avatarUrls[1].avatarUrl)
-            store.set("accountInfo", d.profile.presences[0])
+            store.set("accountInfo", d.profile.presences[0])          
             updateRPC()
         })
     })
@@ -156,9 +156,9 @@ function getPsnPresence() {
         console.log('problem with request: ' + e.message)
     })
     req.end()
-
-
 }
+
+
 
 function updateRPC() {
     var obj = store.get('accountInfo')
@@ -166,9 +166,10 @@ function updateRPC() {
     if (obj.titleName != undefined) {
         client.updatePresence({
             state: 'Playing: ' + obj.titleName,
-            details: obj.onlineStatus,
-  
-            largueImageKey: 'ps4_main',
+            //details: obj.onlineStatus,
+            startTimestamp: Date.now(),
+            largueImageKey: 'ps_largue',
+            smallImageKey: 'ps_small',
             instance: true
         })
     } else {
@@ -178,7 +179,10 @@ function updateRPC() {
 }
 
 function stopRPC() {
-    client.disconnect()
+    client.updatePresence({
+        state: 'Iddle',
+        instance: false
+    });
 }
 
 app.on('ready', () => {
